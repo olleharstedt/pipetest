@@ -13,6 +13,7 @@ class PipeTest extends TestCase
 {
     /**
      * @covers pipe
+     * @covers foo
      */
     public function testPipe()
     {
