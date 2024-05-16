@@ -2,16 +2,20 @@
 
 abstract class Pipe
 {
-    protected $_stack = null;
+    protected $_payload = null;
     public function __call(string $func, array $args)
     {
         if (method_exists($this, $func)) {
-            $result = $this->$func($this->_stack, ... $args);
-            $this->_stack = $result;
+            $result = $this->$func($this->_payload, ... $args);
+            $this->_payload = $result;
             return $this;
         } else {
             throw new RuntimeException("No such method: " . $func);
         }
+    }
+    public function pipe()
+    {
+        return $this->_payload;
     }
 }
 
@@ -40,11 +44,12 @@ final class ReportPipe extends Pipe
 
     protected function renderReport($payload)
     {
-        echo "<table>\n";
+        $s = "<table>\n";
         foreach ($payload as $item) {
-            echo "<tr><td>$item</td></tr>\n";
+            $s .= "<tr><td>$item</td></tr>\n";
         }
-        echo "</table>\n";
+        $s .= "</table>\n";
+        return $s;
     }
 }
 
@@ -53,7 +58,8 @@ $db = new stdClass();
 $sql = 'SELECT * FROM tbl_data';
 
 $r = new ReportPipe($db);
-$r
+echo $r
     ->fetchData($sql)
     ->processData()
-    ->renderReport();
+    ->renderReport()
+    ->pipe();
